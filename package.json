@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/GryshkoRuslan/TeamProject/issues"
   },
-  "homepage": "https://github.com/GryshkoRuslan/TeamProject#readme"
+  "homepage": "https://github.com/GryshkoRuslan/TeamProject#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
