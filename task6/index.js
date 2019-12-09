@@ -25,9 +25,7 @@ const app = function (request) {
 const benchmarkTest = function(request, next) {
     // @TODO: Implement this
     let now = Date.now();
-    let res = next(request);
-    res.processingTime = (Date.now() - now) + ' ms';
-    return res;
+    return {...next(request), processingTime: `${(Date.now() - now)} ms`}
 }
 
 // Middleware stack
