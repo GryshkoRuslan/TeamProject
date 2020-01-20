@@ -1,8 +1,9 @@
-const express = require('express');
-const router = express.Router();
+const orders = require("./orders/orders");
+const categories = require("./categories/categories");
+const products = require("./products/products");
 
-router.get('/', (req, res, next) => {
-  res.send('Main page'); 
-})
-
-module.exports = router;
+module.exports = (app) => {
+  orders(app);
+  categories(app);
+  products(app);
+};
