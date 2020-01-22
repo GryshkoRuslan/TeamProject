@@ -1,31 +1,33 @@
-let getCategories = function (req, res) {
-    res.status(200).json({
-        message: "get categories is ok",
-    })
+let categoriesController = {
+    index (req, res) {
+        res.status(200).json({
+            message: "get categories is ok",
+        })
+    },
+
+    read (req, res) {
+        res.status(200).json({
+            message: "get categories id is ok",
+        })
+    },
+
+    write (req, res) {
+        res.status(200).json({
+            message: "post categories is ok",
+        })
+    },
+
+    update (req, res) {
+        res.status(200).json({
+            message: "put categories is ok",
+        })
+    },
+
+    delete (req, res) {
+        res.status(200).json({
+            message: "del categories is ok",
+        })
+    }
 };
 
-let getCategoriesID = function (req, res) {
-    res.status(200).json({
-        message: "get categories id is ok",
-    })
-};
-
-let postCategories = function (req, res) {
-    res.status(200).json({
-        message: "post categories is ok",
-    })
-};
-
-let putCategories = function (req, res) {
-    res.status(200).json({
-        message: "put categories is ok",
-    })
-};
-
-let delCategories = function (req, res) {
-    res.status(200).json({
-        message: "del categories is ok",
-    })
-};
-
-module.exports = {getCategories, getCategoriesID, postCategories, putCategories, delCategories};
+module.exports = categoriesController;
