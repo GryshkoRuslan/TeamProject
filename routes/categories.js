@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const ordersController = require("../controllers/orders");
+const categoriesController = require("../controllers/categories");
 const AttachResourceController = require("../controllers/AttachResourceController");
 
 router.use(function(req, res, next) {
-    AttachResourceController(router, ordersController);
+    AttachResourceController(router, categoriesController);
     next();
 });
 

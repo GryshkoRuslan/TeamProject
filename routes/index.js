@@ -1,8 +1,9 @@
-const express = require('express');
-const router = express.Router();
+const orders = require("./orders");
+const categories = require("./categories");
+const products = require("./products");
 
-router.get('/', (req, res, next) => {
-  res.send('Main page'); 
-})
-
-module.exports = router;
+module.exports = (app) => {
+  app.use('/orders', orders);
+  app.use('/categories', categories);
+  app.use('/products', products);
+};
