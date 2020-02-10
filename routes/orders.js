@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const ordersController = require("../controllers/orders");
+const ordersController = require("../controllers/ordersController");
 const AttachResourceController = require("../controllers/AttachResourceController");
 
 router.use(function(req, res, next) {

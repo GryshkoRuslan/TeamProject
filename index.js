@@ -1,9 +1,21 @@
 const express = require('express');
 const app = express();
-const port = 3000;
 const bodyParser = require('body-parser');
 const routes = require("./routes/");
+const serviceLocator = require('./services/service.locator');
+const config = require('./config');
 
+
+serviceLocator.register('db', require('knex')({
+    client: 'pg',
+    version: '7.2',
+    connection: {
+        host : config.database.host,
+        user : config.database.user,
+        password : config.database.password,
+        database : config.database.database
+    }
+}));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -16,4 +28,4 @@ app.get("/", function (req, res) {
     });
 });
 
-app.listen(port);
+app.listen(config.server.port);
