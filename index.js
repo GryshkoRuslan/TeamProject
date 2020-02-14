@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const routes = require("./routes/");
 const serviceLocator = require('./services/service.locator');
 const config = require('./config');
-
+const authMiddleware = require('./auth/authMiddleware');
 
 serviceLocator.register('db', require('knex')({
     client: 'pg',
@@ -19,7 +19,7 @@ serviceLocator.register('db', require('knex')({
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-
+app.use(authMiddleware);
 routes(app);
 
 app.get("/", function (req, res) {
