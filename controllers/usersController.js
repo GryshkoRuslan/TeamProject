@@ -3,7 +3,7 @@ const md5 = require('md5');
 
 class usersController {
     static async index (req, res) {
-        if (req.user && req.user.isAdmin == true) {
+        if (req.user && req.user.isadmin == true) {
             let user = await new User().getList();
             if (user.responseCode === 1) {
                 let status = user.status;

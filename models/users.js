@@ -7,7 +7,7 @@ class User extends BaseModel {
     }
 
     getUserByCredentials(username, password) {
-        return this.table.select(['login', 'id', 'email', 'isAdmin'])
+        return this.table.select(['login', 'id', 'email', 'isadmin'])
             .where({
                 login: username,
                 pass: md5(password),
@@ -16,7 +16,7 @@ class User extends BaseModel {
     }
 
     getUserByToken(token) {
-        return this.table.select(['login', 'id', 'email', 'isAdmin'])
+        return this.table.select(['login', 'id', 'email', 'isadmin'])
             .where({
                 token: token,
             })
