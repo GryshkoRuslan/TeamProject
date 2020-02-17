@@ -48,7 +48,7 @@ class authController {
         } else {
             res.status(200).json({
                 data: user,
-                message: "post users is ok",
+                message: "register success",
                 responseCode: 0,
             })
         }
