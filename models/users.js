@@ -1,4 +1,5 @@
 const BaseModel = require('./base.model');
+const md5 = require('md5');
 
 class User extends BaseModel {
     constructor() {
@@ -9,7 +10,7 @@ class User extends BaseModel {
         return this.table.select(['login', 'id', 'email', 'isAdmin'])
             .where({
                 login: username,
-                pass: password,
+                pass: md5(password),
             })
             .first()
     }

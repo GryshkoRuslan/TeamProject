@@ -76,7 +76,8 @@ const Erros = (code) => {
             return msg
         }
         default: {
-            console.log('Неизвестная ошибка');
+            msg.message = `Неизвестная ошибка SQLSTATE - ${code}`;
+            return msg
         }
     }
 };

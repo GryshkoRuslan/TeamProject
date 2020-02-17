@@ -12,7 +12,6 @@ passport.use(new LocalStrategy(
         if(!user) {
             return done('User not found', false);
         }
-
         user.token = uuidv4();
         await UserModel.store(user);
         return done (null, user)
@@ -21,7 +20,6 @@ passport.use(new LocalStrategy(
 
 passport.use(new BearerStrategy(
     async function(token, done) {
-        console.log(token);
         const UserModel = new User();
         const user = await UserModel.getUserByToken(token);
 
