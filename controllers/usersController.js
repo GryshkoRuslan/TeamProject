@@ -1,9 +1,10 @@
 const User = require('../models/users');
 const md5 = require('md5');
+const Roles = require('../auth/acl').Roles;
 
 class usersController {
     static async index (req, res) {
-        if (req.user && req.user.isadmin == true) {
+        if (req.user.role  == Roles.ADMIN) {
             let user = await new User().getList();
             if (user.responseCode === 1) {
                 let status = user.status;
@@ -16,7 +17,7 @@ class usersController {
                     responseCode: 0,
                 })
             }
-        } else if (!req.user) {
+        } else if (req.user.role === Roles.GUEST) {
             res.status(401).json({
                 message: "Авторизируйтесь",
                 responseCode: 1,
