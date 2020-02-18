@@ -23,6 +23,13 @@ app.use(authMiddleware);
 
 routes(app);
 
+app.use(function(err,req,res,next) {
+   res.status(err.status);
+   res.json({
+       message: err.message,
+       responseCode: 1,
+   })
+});
 
 app.get("/", function (req, res) {
     res.status(200).json({

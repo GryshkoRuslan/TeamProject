@@ -1,6 +1,7 @@
 const passport = require('../auth/passport');
 const User = require('../models/users');
 const md5 = require('md5');
+const createError = require('http-errors');
 
 class authController {
     static login (req, res) {
@@ -12,14 +13,11 @@ class authController {
         })(req, res)
     }
 
-    static async logout (req, res) {
+    static async logout (req, res, next) {
         let UserModel = new User();
         let user = await UserModel.find(req.query.id);
         if(!user) {
-            res.status(404).json({
-                message:'Пользователь не найден',
-                responseCode: 1,
-            })
+            next(createError(404, "Пользователь не найден"));
         } else {
             user.token = null;
             let result = await UserModel.store(user);
@@ -30,21 +28,17 @@ class authController {
                     responseCode: 0,
                 })
             } else {
-                let status = result.status;
-                delete result.status;
-                res.status(status).json(result);
+                return next(result); //в result ошибка
             }
         }
     }
 
-    static async register (req, res) {
+    static async register (req, res, next) {
         let UserModel = new User();
         req.query.pass=md5(req.query.pass);
         let user = await UserModel.create(req.query);
-        if (user.responseCode===1) {
-            let status = user.status;
-            delete user.status;
-            res.status(status).json(user)
+        if (user.status) {
+            next(user);
         } else {
             res.status(200).json({
                 data: user,
