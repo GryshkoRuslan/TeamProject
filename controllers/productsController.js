@@ -1,12 +1,10 @@
 const Product = require('../models/products');
 
 class productsController {
-    static async index (req, res) {
+    static async index (req, res, next) {
         let product = await new Product().getList();
-        if (product.responseCode===1) {
-            let status = product.status;
-            delete product.status;
-            res.status(status).json(product)
+        if (product.status) {
+            next(product);
         } else {
             res.status(200).json({
                 data: product,
@@ -16,12 +14,10 @@ class productsController {
         }
     }
 
-    static async read (req, res) {
+    static async read (req, res, next) {
         let product = await new Product().find(req.params.id);
-        if (product.responseCode===1) {
-            let status = product.status;
-            delete product.status;
-            res.status(status).json(product)
+        if (product.status) {
+            next(product);
         } else {
             res.status(200).json({
                 data: product,
@@ -31,21 +27,23 @@ class productsController {
         }
     }
 
-    static async write (req, res) {
+    static async write (req, res, next) {
         let product = await new Product().create(req.body);
-        res.status(200).json({
-            data: product,
-            message: "post products is ok",
-            responseCode: 0,
-        })
+        if (product.status) {
+            next(product);
+        } else {
+            res.status(200).json({
+                data: product,
+                message: "post products is ok",
+                responseCode: 0,
+            })
+        }
     }
 
-    static async update (req, res) {
+    static async update (req, res, next) {
         let product = await new Product().store(req.body);
-        if (product.responseCode===1) {
-            let status = product.status;
-            delete product.status;
-            res.status(status).json(product)
+        if (product.status) {
+            next(product);
         } else {
             res.status(200).json({
                 data: product,
@@ -55,13 +53,10 @@ class productsController {
         }
     }
 
-    static async delete (req, res) {
+    static async delete (req, res, next) {
         let product = await new Product().remove(req.body.id);
-        console.log(product);
-        if (product.responseCode===1) {
-            let status = product.status;
-            delete product.status;
-            res.status(status).json(product)
+        if (product.status) {
+            next(product);
         } else {
             res.status(200).json({
                 data: [],

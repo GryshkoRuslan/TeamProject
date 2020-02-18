@@ -1,12 +1,10 @@
 const Category = require('../models/categories');
 
 class categoriesController {
-    static async index (req, res) {
+    static async index (req, res, next) {
         let category = await new Category().getList();
-        if (category.responseCode===1) {
-            let status = category.status;
-            delete category.status;
-            res.status(status).json(category)
+        if (category.status) {
+            next(category);
         } else {
             res.status(200).json({
                 data: category,
@@ -16,12 +14,10 @@ class categoriesController {
         }
     }
 
-    static async read (req, res) {
+    static async read (req, res, next) {
         let category = await new Category().find(req.params.id);
-        if (category.responseCode===1) {
-            let status = category.status;
-            delete category.status;
-            res.status(status).json(category)
+        if (category.status) {
+            next(category);
         } else {
             res.status(200).json({
                 data: category,
@@ -31,12 +27,10 @@ class categoriesController {
         }
     }
 
-    static async write (req, res) {
+    static async write (req, res, next) {
         let category = await new Category().create(req.body);
-        if (category.responseCode===1) {
-            let status = category.status;
-            delete category.status;
-            res.status(status).json(category)
+        if (category.status) {
+            next(category);
         } else {
             res.status(200).json({
                 data: category,
@@ -46,12 +40,10 @@ class categoriesController {
         }
     }
 
-    static async update (req, res) {
+    static async update (req, res, next) {
         let category = await new Category().store(req.body);
-        if (category.responseCode===1) {
-            let status = category.status;
-            delete category.status;
-            res.status(status).json(category)
+        if (category.status) {
+            next(category);
         } else {
             res.status(200).json({
                 data: category,
@@ -61,13 +53,10 @@ class categoriesController {
         }
     }
 
-    static async delete (req, res) {
+    static async delete (req, res, next) {
         let category = await new Category().remove(req.body.id);
-        console.log(category);
-        if (category.responseCode===1) {
-            let status = category.status;
-            delete category.status;
-            res.status(status).json(category)
+        if (category.status) {
+            next(category);
         } else {
             res.status(200).json({
                 data: [],

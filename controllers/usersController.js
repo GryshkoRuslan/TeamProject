@@ -7,10 +7,8 @@ class usersController {
     static async index (req, res, next) {
         if (req.user.role  == Roles.ADMIN) {
             let user = await new User().getList();
-            if (user.responseCode === 1) {
-                let status = user.status;
-                delete user.status;
-                res.status(status).json(user);
+            if (user.status) {
+                next(user);
             } else {
                 res.status(200).json({
                     data: user,
