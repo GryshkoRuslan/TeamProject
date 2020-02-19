@@ -15,7 +15,7 @@ class productsController {
     }
 
     static async read (req, res, next) {
-        let product = await new Product().find(req.params.id);
+        let product = await new Product().getProductWithCategories(req.params.id);
         if (product.status) {
             next(product);
         } else {

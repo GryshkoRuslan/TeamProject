@@ -1,5 +1,6 @@
 const BaseModel = require('./base.model');
 const md5 = require('md5');
+const Errors = require('./Errors');
 
 class User extends BaseModel {
     constructor() {
@@ -13,6 +14,9 @@ class User extends BaseModel {
                 pass: md5(password),
             })
             .first()
+            .catch(err=> {
+                return Errors(err.code);
+            })
     }
 
     getUserByToken(token) {
@@ -21,6 +25,9 @@ class User extends BaseModel {
                 token: token,
             })
             .first()
+            .catch(err=> {
+                return Errors(err.code);
+            })
     }
 }
 
