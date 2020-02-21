@@ -1,8 +1,10 @@
 const Product = require('../models/products');
+const Roles = require('../auth/acl').Roles;
+const createError = require('http-errors');
 
 class productsController {
     static async index (req, res, next) {
-        let result = await new Product().getProductList();
+        let result = await new Product().getProductList(req.query.page);
         if (result.status) {
             next(result);
         } else {
@@ -29,38 +31,50 @@ class productsController {
     }
 
     static async write (req, res, next) {
-        let product = await new Product().saveProduct(req.body);
-        if (product.status) {
-            next(product);
+        if (req.user.role  !== Roles.ADMIN) {
+            next(createError(403, "Не хватает прав"));
         } else {
-            res.status(200).json({
-                message: `${product} - добавлен`,
-                responseCode: 0,
-            })
+            let product = await new Product().saveProduct(req.body);
+            if (product.status) {
+                next(product);
+            } else {
+                res.status(200).json({
+                    message: `${product} - добавлен`,
+                    responseCode: 0,
+                })
+            }
         }
     }
 
     static async update (req, res, next) {
-        let product = await new Product().updateProduct(req.body);
-        if (product.status) {
-            next(product);
+        if (req.user.role  !== Roles.ADMIN) {
+            next(createError(403, "Не хватает прав"));
         } else {
-            res.status(200).json({
-                message: `Данные ${product} изменены`,
-                responseCode: 0,
-            })
+            let product = await new Product().updateProduct(req.body);
+            if (product.status) {
+                next(product);
+            } else {
+                res.status(200).json({
+                    message: `Данные ${product} изменены`,
+                    responseCode: 0,
+                })
+            }
         }
     }
 
     static async delete (req, res, next) {
-        let product = await new Product().deleteProduct(req.body.id);
-        if (product.status) {
-            next(product);
+        if (req.user.role  !== Roles.ADMIN) {
+            next(createError(403, "Не хватает прав"));
         } else {
-            res.status(200).json({
-                message: "Товар успешно удален",
-                responseCode: 0,
-            })
+            let product = await new Product().deleteProduct(req.body.id);
+            if (product.status) {
+                next(product);
+            } else {
+                res.status(200).json({
+                    message: "Товар успешно удален",
+                    responseCode: 0,
+                })
+            }
         }
     }
 }
