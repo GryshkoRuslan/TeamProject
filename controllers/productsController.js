@@ -2,12 +2,13 @@ const Product = require('../models/products');
 
 class productsController {
     static async index (req, res, next) {
-        let product = await new Product().getList();
-        if (product.status) {
-            next(product);
+        let result = await new Product().getProductList();
+        if (result.status) {
+            next(result);
         } else {
             res.status(200).json({
-                data: product,
+                data: result.products,
+                count: result.count,
                 message: "get products is ok",
                 responseCode: 0,
             })
