@@ -52,13 +52,12 @@ class productsController {
     }
 
     static async delete (req, res, next) {
-        let product = await new Product().remove(req.body.id);
+        let product = await new Product().deleteProduct(req.body.id);
         if (product.status) {
             next(product);
         } else {
             res.status(200).json({
-                data: [],
-                message: "del products is ok",
+                message: "Товар успешно удален",
                 responseCode: 0,
             })
         }

@@ -127,6 +127,20 @@ class Product extends BaseModel {
         }
     }
 
+    async deleteProduct(id) {
+        try {
+            await serviceLocator.get('db').transaction(async trx => {
+                await trx('categories_lists').where('id_products', id).del();
+                await trx('product_attributes_value').where('id_products', id).del();
+                await trx('products').where('id', id).del();
+
+            });
+            return id;
+        } catch (err) {
+            return Errors(err.code);
+        }
+    }
+
 }
 
 module.exports = Product;
