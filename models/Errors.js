@@ -2,8 +2,14 @@ const createError = require('http-errors');
 
 const Erros = (code) => {
     switch (code) {
+        case '404': {
+            return createError(404, 'Запрашиваемая страница не найдена')
+        }
         case '23505': {
             return createError(400, 'Нарушение ограничения уникальности')
+        }
+        case '23503': {
+            return createError(400, 'Нарушение внешнего ключа')
         }
         case '42703': {
             return createError(400, 'Переданны неправильные данные')

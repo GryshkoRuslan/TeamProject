@@ -28,26 +28,24 @@ class productsController {
     }
 
     static async write (req, res, next) {
-        let product = await new Product().create(req.body);
+        let product = await new Product().saveProduct(req.body);
         if (product.status) {
             next(product);
         } else {
             res.status(200).json({
-                data: product,
-                message: "post products is ok",
+                message: `${product} - добавлен`,
                 responseCode: 0,
             })
         }
     }
 
     static async update (req, res, next) {
-        let product = await new Product().store(req.body);
+        let product = await new Product().updateProduct(req.body);
         if (product.status) {
             next(product);
         } else {
             res.status(200).json({
-                data: product,
-                message: "put products is ok",
+                message: `Данные ${product} изменены`,
                 responseCode: 0,
             })
         }

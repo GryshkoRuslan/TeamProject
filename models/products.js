@@ -18,6 +18,9 @@ class Product extends BaseModel {
 
     async getProductWithCategories(id) {
         let product = await this.find(id);
+        if (product==undefined) {
+            return Errors('404')
+        }
         if (product.status) {
             return product
         }
@@ -54,6 +57,74 @@ class Product extends BaseModel {
         product.attributes = attributes_value;
         product.categories = categories;
         return product
+    }
+
+    async saveProduct(product) {
+        let attributes = product.attributes;
+        delete product.attributes;
+        let categories = product.categories;
+        delete product.categories;
+        try {
+            await serviceLocator.get('db').transaction(async trx => {
+                let productID = await trx('products').insert(product, 'id').transacting(trx);
+                if (attributes!==undefined) {
+                    attributes.forEach(attr=> attr['id_products'] = productID[0]);
+                    await trx('product_attributes_value').insert(attributes);
+                }
+                if (categories!==undefined) {
+                    categories.forEach(categ=> categ['id_products'] = productID[0]);
+                    await trx('categories_lists').insert(categories);
+                }
+
+            });
+            return product.name;
+        } catch (err) {
+            return Errors(err.code);
+        }
+    }
+
+    async updateProduct(product) {
+        let attributes = product.attributes;
+        delete product.attributes;
+        let newAttributes = product.newAttributes;
+        delete product.newAttributes;
+        let newCategories = product.newCategories;
+        delete product.newCategories;
+        let oldAttributes = product.oldAttributes;
+        delete product.oldAttributes;
+        let oldCategories = product.oldCategories;
+        delete product.oldCategories;
+        try {
+            await serviceLocator.get('db').transaction(async trx => {
+                await trx('products').where('id', product.id).update(product, 'id').transacting(trx);
+                if (attributes!==undefined) {
+                   for(let i=0; i<attributes.length; i++) {
+                       await trx('product_attributes_value').where('id', attributes[i].id).update(attributes[i]);
+                   }
+                }
+                if (newAttributes) {
+                    newAttributes.forEach(attr=> attr['id_products'] = product.id);
+                    await trx('product_attributes_value').insert(newAttributes);
+                }
+                if (newCategories) {
+                    newCategories.forEach(categ=> categ['id_products'] = product.id);
+                    await trx('categories_lists').insert(newCategories);
+                }
+                if (oldAttributes!==undefined) {
+                    for(let i=0; i<oldAttributes.length; i++) {
+                        await trx('product_attributes_value').where('id', oldAttributes[i].id).del();
+                    }
+                }
+                if (oldCategories!==undefined) {
+                    for(let i=0; i<oldCategories.length; i++) {
+                        await trx('categories_lists').where('id', oldCategories[i].id).del();
+                    }
+                }
+            });
+            return product.name;
+        } catch (err) {
+            return Errors(err.code);
+        }
     }
 
 }
