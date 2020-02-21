@@ -19,6 +19,7 @@ class BaseModel {
     find(id) {
         return this.table.where('id', id)
             .select('*')
+            .first()
             .catch(err=> {
                 return Errors(err.code);
             })

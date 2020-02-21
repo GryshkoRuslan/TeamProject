@@ -1,12 +1,10 @@
 const Order = require('../models/orders');
 
 class ordersController {
-    static async index (req, res) {
+    static async index (req, res, next) {
         let order = await new Order().getList();
-        if (order.responseCode===1) {
-            let status = order.status;
-            delete order.status;
-            res.status(status).json(order)
+        if (order.status) {
+            next(order);
         } else {
             res.status(200).json({
                 data: order,
@@ -16,12 +14,10 @@ class ordersController {
         }
     }
 
-    static async read (req, res) {
+    static async read (req, res, next) {
         let order = await new Order().find(req.params.id);
-        if (order.responseCode===1) {
-            let status = order.status;
-            delete order.status;
-            res.status(status).json(order)
+        if (order.status) {
+            next(order);
         } else {
             res.status(200).json({
                 data: order,
@@ -31,12 +27,10 @@ class ordersController {
         }
     }
 
-    static async write (req, res) {
+    static async write (req, res, next) {
         let order = await new Order().create(req.body);
-        if (order.responseCode===1) {
-            let status = order.status;
-            delete order.status;
-            res.status(status).json(order)
+        if (order.status) {
+            next(order);
         } else {
             res.status(200).json({
                 data: order,
@@ -46,12 +40,10 @@ class ordersController {
         }
     }
 
-    static async update (req, res) {
+    static async update (req, res, next) {
         let order = await new Order().store(req.body);
-        if (order.responseCode===1) {
-            let status = order.status;
-            delete order.status;
-            res.status(status).json(order)
+        if (order.status) {
+            next(order);
         } else {
             res.status(200).json({
                 data: order,
@@ -61,13 +53,10 @@ class ordersController {
         }
     }
 
-    static async delete (req, res) {
+    static async delete (req, res, next) {
         let order = await new Order().remove(req.body.id);
-        console.log(order);
-        if (order.responseCode===1) {
-            let status = order.status;
-            delete order.status;
-            res.status(status).json(order)
+        if (order.status) {
+            next(order);
         } else {
             res.status(200).json({
                 data: [],
