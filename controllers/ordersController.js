@@ -37,34 +37,31 @@ class ordersController {
             next(order);
         } else {
             res.status(200).json({
-                data: order,
-                message: "post order is ok",
+                message: `Заказ создан под номером ${order}`,
                 responseCode: 0,
             })
         }
     }
 
     static async update (req, res, next) {
-        let order = await new Order().store(req.body);
+        let order = await new Order().updateOrder(req.body);
         if (order.status && Number.isInteger(order.status)) {
             next(order);
         } else {
             res.status(200).json({
-                data: order,
-                message: "put orders is ok",
+                message: `Данные заказа №${order} успешно изменены`,
                 responseCode: 0,
             })
         }
     }
 
     static async delete (req, res, next) {
-        let order = await new Order().remove(req.body.id);
+        let order = await new Order().deleteOrder(req.body.id);
         if (order.status && Number.isInteger(order.status)) {
             next(order);
         } else {
             res.status(200).json({
-                data: [],
-                message: "del orders is ok",
+                message: `Заказ №${order} успешно удален`,
                 responseCode: 0,
             })
         }

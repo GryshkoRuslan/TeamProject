@@ -31,13 +31,6 @@ class Order extends BaseModel {
         return order[0]
     }
 
-    async addProductInOrder(product) {
-        let orderList = await this.ordersListsTable.insert(product, 'id')
-            .catch(err=>{
-                return Errors(err.code);
-            })
-    }
-
     async createOrderWithProducts(data) {
         let order = data;
         let products = order.products;
@@ -52,9 +45,52 @@ class Order extends BaseModel {
                 await trx('orders_lists').insert(products);
                 return orderID[0]
             });
-            return {"id": id_order}
+            return id_order
         } catch (err) {
             return Errors(err.code)
+        }
+    }
+
+    async updateOrder(order) {
+        let products = order.products;
+        delete order.products;
+        let newProducts = order.newProducts;
+        delete order.newProducts;
+        let oldProducts = order.oldProducts;
+        delete order.oldProducts;
+        try {
+            await serviceLocator.get('db').transaction(async trx => {
+                await trx('orders').where('id', order.id).update(order, 'id').transacting(trx);
+                if (products!==undefined) {
+                    for(let i=0; i<products.length; i++) {
+                        await trx('orders_lists').where('id', products[i].id).update(products[i]);
+                    }
+                }
+                if (newProducts) {
+                    newProducts.forEach(attr=> attr['id_orders'] = order.id);
+                    await trx('orders_lists').insert(newProducts);
+                }
+                if (oldProducts) {
+                    for(let i=0; i<oldProducts.length; i++) {
+                        await trx('orders_lists').where('id', oldProducts[i].id).del();
+                    }
+                }
+            });
+            return order.id
+        } catch (err) {
+            return Errors(err.code)
+        }
+    }
+
+    async deleteOrder(id) {
+        try {
+            await serviceLocator.get('db').transaction(async trx => {
+                await trx('orders_lists').where('id_orders', id).del();
+                await trx('orders').where('id', id).del();
+            });
+            return id;
+        } catch (err) {
+            return Errors(err.code);
         }
     }
 }
