@@ -73,7 +73,7 @@ class Product extends BaseModel {
         return product
     }
 
-    async saveProduct(product) {
+    async createProduct(product) {
         let attributes = product.attributes;
         delete product.attributes;
         let categories = product.categories;

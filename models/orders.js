@@ -35,9 +35,6 @@ class Order extends BaseModel {
         let order = data;
         let products = order.products;
         delete order.products;
-        order["total_price"] = products.reduce((sum, product)=> {
-            return sum+product["total_price"]
-        }, 0);
         try {
             let id_order = await serviceLocator.get('db').transaction(async trx => {
                 let orderID = await trx('orders').insert(order, 'id');

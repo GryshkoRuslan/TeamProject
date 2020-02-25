@@ -28,7 +28,7 @@ class categoriesController {
     }
 
     static async write (req, res, next) {
-        let category = await new Category().create(req.body);
+        let category = await new Category().createCategorie(req.body);
         if (category.status) {
             next(category);
         } else {
@@ -41,13 +41,12 @@ class categoriesController {
     }
 
     static async update (req, res, next) {
-        let category = await new Category().store(req.body);
+        let category = await new Category().updateCategory(req.body);
         if (category.status) {
             next(category);
         } else {
             res.status(200).json({
-                data: category,
-                message: "put categories is ok",
+                message: `Данные категории - ${category} обновлены`,
                 responseCode: 0,
             })
         }

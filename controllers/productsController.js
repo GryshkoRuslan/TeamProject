@@ -34,7 +34,7 @@ class productsController {
         if (req.user.role  !== Roles.ADMIN) {
             next(createError(403, "Не хватает прав"));
         } else {
-            let product = await new Product().saveProduct(req.body);
+            let product = await new Product().createProduct(req.body);
             if (product.status) {
                 next(product);
             } else {
