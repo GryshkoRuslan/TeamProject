@@ -45,44 +45,56 @@ class usersController {
     }
 
     static async write (req, res, next) {
-        req.body.pass=md5(req.body.pass);
-        let user = await new User().create(req.body);
-        if(!user) {
-            next(createError(404, "Пользователь не найден"));
-        } else if (user.status) {
-            next(user);
-        } else {
-            res.status(200).json({
-                data: user,
-                message: "post users is ok",
-                responseCode: 0,
-            })
+        if (req.user.role  == Roles.ADMIN) {
+            req.body.pass = md5(req.body.pass);
+            let user = await new User().create(req.body);
+            if (!user) {
+                next(createError(404, "Пользователь не найден"));
+            } else if (user.status) {
+                next(user);
+            } else {
+                res.status(200).json({
+                    data: user,
+                    message: "post users is ok",
+                    responseCode: 0,
+                })
+            }
+        }  else {
+            next(createError(403, "Не хватает прав"));
         }
     }
 
     static async update (req, res, next) {
-        let user = await new User().store(req.body);
-        if (user.status) {
-            next(user);
-        } else {
-            res.status(200).json({
-                data: user,
-                message: "put users is ok",
-                responseCode: 0,
-            })
+        if (req.user.role  == Roles.ADMIN) {
+            let user = await new User().store(req.body);
+            if (user.status) {
+                next(user);
+            } else {
+                res.status(200).json({
+                    data: user,
+                    message: "put users is ok",
+                    responseCode: 0,
+                })
+            }
+        }  else {
+            next(createError(403, "Не хватает прав"));
         }
     }
 
     static async delete (req, res, next) {
-        let user = await new User().remove(req.body.id);
-        if (user.status) {
-            next(user);
-        } else {
-            res.status(200).json({
-                data: [],
-                message: "del users is ok",
-                responseCode: 0,
-            })
+        if (req.user.role  == Roles.ADMIN) {
+            let user = await new User().remove(req.body.id);
+            if (user.status) {
+                next(user);
+            } else {
+                res.status(200).json({
+                    data: [],
+                    message: "del users is ok",
+                    responseCode: 0,
+                })
+            }
+        }  else {
+            next(createError(403, "Не хватает прав"));
         }
     }
 }

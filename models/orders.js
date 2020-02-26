@@ -1,6 +1,7 @@
 const BaseModel = require('./base.model');
 const serviceLocator = require('../services/service.locator');
 const Errors = require('./Errors');
+const createError = require('http-errors');
 
 class Order extends BaseModel {
     constructor() {
@@ -18,12 +19,18 @@ class Order extends BaseModel {
         return orders
     }
 
-    async getOrderWithProducts(id) {
-        let order = await this.table.select('*').where('id', id)
+    async getOrderWithProducts(idOrder, idUser) {
+        let order = await this.table.select('*').where('id', idOrder)
             .catch(err=> {
                 return Errors(err.code);
             });
-        let products = await this.ordersListsTable.select('*').where('id_orders', id)
+        if (order.length === 0) {
+            return Errors('404')
+        }
+        if (order[0]["id_users"]!==idUser) {
+            return createError(403, "Не хватает прав")
+        }
+        let products = await this.ordersListsTable.select('*').where('id_orders', idOrder)
             .catch(err=> {
             return Errors(err.code);
         });
@@ -31,10 +38,11 @@ class Order extends BaseModel {
         return order[0]
     }
 
-    async createOrderWithProducts(data) {
+    async createOrderWithProducts(data, idUser) {
         let order = data;
         let products = order.products;
         delete order.products;
+        order["id_users"] = idUser;
         try {
             let id_order = await serviceLocator.get('db').transaction(async trx => {
                 let orderID = await trx('orders').insert(order, 'id');
