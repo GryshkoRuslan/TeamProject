@@ -6,6 +6,7 @@ const AttachResourceController = require("../controllers/AttachResourceControlle
 
 router.use(function(req, res, next) {
     AttachResourceController(router, productsController);
+/*    router.get("/", productsController.getWithFilters);*/
     next();
 });
 

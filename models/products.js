@@ -30,6 +30,29 @@ class Product extends BaseModel {
         return {products: products, count: count[0].count}
     }
 
+    async getProductsWithFilters (query) {
+        let page = +query.page || 1;
+        let offset = (page-1)*10;
+        let idCategories = query.category.split(',');
+        let idProductsObjects = await this.categoriesProductTable
+            .select('id_products as id')
+            .whereIn('id_categories', idCategories)
+            .catch(err=> {
+                return Errors(err.code);
+            });
+        let idProducts = idProductsObjects.map(p=> p.id);
+        let products = await this.table.select('*')
+            .whereIn('id', idProducts)
+            .limit(10)
+            .offset(offset)
+            .groupBy('id')
+            .orderBy('id')
+            .catch(err=> {
+                return Errors(err.code);
+            });
+        return {products: products, count: idProducts.length}
+    }
+
     async getProductWithCategories(id) {
         let product = await this.find(id);
         if (product==undefined) {

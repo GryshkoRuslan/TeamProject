@@ -4,7 +4,12 @@ const createError = require('http-errors');
 
 class productsController {
     static async index (req, res, next) {
-        let result = await new Product().getProductList(req.query.page);
+        let result;
+        if (Object.keys(req.query).length==0 || Object.keys(req.query).length==1 && req.query.hasOwnProperty("page")) {
+            result = await new Product().getProductList(req.query.page);
+        } else {
+            result = await new Product().getProductsWithFilters(req.query);
+        }
         if (result.status) {
             next(result);
         } else {
