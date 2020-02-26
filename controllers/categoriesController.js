@@ -1,4 +1,5 @@
 const Category = require('../models/categories');
+const Errors = require('../models/Errors');
 
 class categoriesController {
     static async index (req, res, next) {
@@ -16,19 +17,36 @@ class categoriesController {
 
     static async read (req, res, next) {
         let category = await new Category().find(req.params.id);
-        if (category.status) {
+        if(category==undefined) {
+            next(Errors('404'))
+        } else if (category.status) {
             next(category);
         } else {
             res.status(200).json({
                 data: category,
-                message: "get categories id is ok",
+                message: "get category id is ok",
+                responseCode: 0,
+            })
+        }
+    }
+
+    static async readAttributtes (req, res, next) {
+        let category = await new Category().getAttributesByCategory(req.params.id);
+        if(category==undefined) {
+            next(Errors('404'))
+        } else if (category.status) {
+            next(category);
+        } else {
+            res.status(200).json({
+                data: category,
+                message: "Атрибуты для данной категории получены успешно",
                 responseCode: 0,
             })
         }
     }
 
     static async write (req, res, next) {
-        let category = await new Category().createCategorie(req.body);
+        let category = await new Category().createCategory(req.body);
         if (category.status) {
             next(category);
         } else {

@@ -6,6 +6,7 @@ const AttachResourceController = require("../controllers/AttachResourceControlle
 
 router.use(function(req, res, next) {
     AttachResourceController(router, categoriesController);
+    router.get("/attributes/:id", categoriesController.readAttributtes);
     next();
 });
 
