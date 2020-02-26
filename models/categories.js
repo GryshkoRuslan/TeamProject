@@ -58,6 +58,18 @@ class Categorie extends BaseModel {
             return Errors(err.code)
         }
     }
+
+    async deleteCategory(id) {
+        try {
+            await serviceLocator.get('db').transaction(async trx => {
+                await trx('categories_attributes').where('id_categories', id).del();
+                await trx('categories').where('id', id).del();
+            });
+            return id;
+        } catch (err) {
+            return Errors(err.code);
+        }
+    }
 }
 
 module.exports = Categorie;

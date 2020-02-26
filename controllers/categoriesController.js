@@ -34,7 +34,7 @@ class categoriesController {
         } else {
             res.status(200).json({
                 data: category,
-                message: "post categories is ok",
+                message: `Новая категория успешно создана`,
                 responseCode: 0,
             })
         }
@@ -53,13 +53,12 @@ class categoriesController {
     }
 
     static async delete (req, res, next) {
-        let category = await new Category().remove(req.body.id);
+        let category = await new Category().deleteCategory(req.body.id);
         if (category.status) {
             next(category);
         } else {
             res.status(200).json({
-                data: [],
-                message: "del categories is ok",
+                message: "Категория успешно удалена",
                 responseCode: 0,
             })
         }
