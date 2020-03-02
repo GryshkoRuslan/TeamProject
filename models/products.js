@@ -17,8 +17,8 @@ class Product extends BaseModel {
     }
 
     async getProductList (page=1) {
-        let offset = (page-1)*10;
-        let products = await this.table.select('*').limit(10).offset(offset).groupBy('id')
+        let offset = (page-1)*12;
+        let products = await this.table.select('*').limit(12).offset(offset).groupBy('id')
             .catch(err=> {
                 return Errors(err.code);
             });
