@@ -2,6 +2,10 @@ const BaseModel = require('./base.model');
 const serviceLocator = require('../services/service.locator');
 const Errors = require('./Errors');
 const createError = require('http-errors');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const {dateConversion} = require("../services/dateConversion");
+dayjs.extend(utc);
 
 class Order extends BaseModel {
     constructor() {
@@ -16,7 +20,12 @@ class Order extends BaseModel {
             .catch(err=> {
                 return Errors(err.code);
             });
-        return orders
+        let result = orders.map(o=> {
+            o["date_start"] = dateConversion(o["date_start"]);
+            o["date_end"] = dateConversion(o["date_end"]);
+            return o
+        });
+        return result
     }
 
     async getOrderWithProducts(idOrder, idUser) {
@@ -35,6 +44,8 @@ class Order extends BaseModel {
             return Errors(err.code);
         });
         order[0].products = products;
+        order[0]["date_start"] = dateConversion(order[0]["date_start"]);
+        order[0]["date_end"] = dateConversion(order[0]["date_end"]);
         return order[0]
     }
 
