@@ -7,12 +7,12 @@ const ordersController = require("../controllers/ordersController");
 const AttachResourceController = require("../controllers/AttachResourceController");
 
 router.use(function(req, res, next) {
-    if (req.user.role === Roles.GUEST) {
+/*    if (req.user.role === Roles.GUEST) {
         next(createError(401, "Авторизируйтесь"));
-    } else {
+    } else {*/
         AttachResourceController(router, ordersController);
         next();
-    }
+/*    }*/
 });
 
 
