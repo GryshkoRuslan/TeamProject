@@ -45,7 +45,7 @@ class usersController {
     }
 
     static async write (req, res, next) {
-        if (req.user.role  == Roles.ADMIN) {
+        /*if (req.user.role  == Roles.ADMIN) {*/
             req.body.pass = md5(req.body.pass);
             let user = await new User().create(req.body);
             if (!user) {
@@ -59,9 +59,9 @@ class usersController {
                     responseCode: 0,
                 })
             }
-        }  else {
+       /* }  else {
             next(createError(403, "Не хватает прав"));
-        }
+        }*/
     }
 
     static async update (req, res, next) {
