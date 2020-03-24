@@ -1,4 +1,5 @@
 const BaseModel = require('./base.model');
+const Products = require('./products');
 const serviceLocator = require('../services/service.locator');
 const Errors = require('./Errors');
 const createError = require('http-errors');
@@ -43,7 +44,14 @@ class Order extends BaseModel {
             .catch(err=> {
             return Errors(err.code);
         });
-        order[0].products = products;
+        let productsWithAttributes = await (async (products) => {
+            for (let i=0; i<products.length; i++) {
+                console.log("ok");
+                products[i].fullProductInfo = await new Products().getProductWithCategories(products[i]["id_products"]);
+            }
+            return products;
+        })(products);
+        order[0].products = productsWithAttributes;
         order[0]["date_start"] = dateConversion(order[0]["date_start"]);
         order[0]["date_end"] = dateConversion(order[0]["date_end"]);
         return order[0]
