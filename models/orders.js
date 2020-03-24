@@ -46,7 +46,6 @@ class Order extends BaseModel {
         });
         let productsWithAttributes = await (async (products) => {
             for (let i=0; i<products.length; i++) {
-                console.log("ok");
                 products[i].fullProductInfo = await new Products().getProductWithCategories(products[i]["id_products"]);
             }
             return products;
