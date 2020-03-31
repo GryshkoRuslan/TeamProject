@@ -43,7 +43,9 @@ class Product extends BaseModel {
             });
         let idProducts = idProductsObjects.map(p=> p.id);
 
-        let attributtesIdForFilters = filtersAttributesForCategories(idCategory);
+        let attributtesForFilters = filtersAttributesForCategories(idCategory);
+        let categoryName = attributtesForFilters.categoryName;
+        let attributtesIdForFilters = attributtesForFilters.ids;
         let filtersData = {};
         if (attributtesIdForFilters) {
             let attributesValueForFilters = await serviceLocator.get('db').table('product_attributes_value')
@@ -62,7 +64,8 @@ class Product extends BaseModel {
                     return Errors(err.code);
                 });
             filtersData.attributes = attributesNameAndId;
-            filtersData.values = filtersValue
+            filtersData.values = filtersValue;
+            filtersData.categoryName = categoryName;
         }
 
         let products = await this.table.select('*')
