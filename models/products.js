@@ -1,6 +1,7 @@
 const BaseModel = require('./base.model');
 const serviceLocator = require('../services/service.locator');
 const Errors = require('./Errors');
+const {filtersAttributesForCategories} = require("../services/filtersAttributesForCategories");
 
 class Product extends BaseModel {
     constructor() {
@@ -33,14 +34,37 @@ class Product extends BaseModel {
     async getProductsWithFilters (query) {
         let page = +query.page || 1;
         let offset = (page-1)*10;
-        let idCategories = query.category.split(',');
+        let idCategory = query.category;
         let idProductsObjects = await this.categoriesProductTable
             .select('id_products as id')
-            .whereIn('id_categories', idCategories)
+            .where('id_categories', idCategory)
             .catch(err=> {
                 return Errors(err.code);
             });
         let idProducts = idProductsObjects.map(p=> p.id);
+
+        let attributtesIdForFilters = filtersAttributesForCategories(idCategory);
+        let filtersData = {};
+        if (attributtesIdForFilters) {
+            let attributesValueForFilters = await serviceLocator.get('db').table('product_attributes_value')
+                .select('id_product_attributes', 'value')
+                .whereIn('id_products', idProducts)
+                .catch( err => {
+                    return Errors(err.code);
+                });
+            let filtersValue = attributesValueForFilters.filter(a => {
+                return a.id_product_attributes == attributtesIdForFilters.filter(id => id===a.id_product_attributes);
+            });
+            let attributesNameAndId = await serviceLocator.get('db').table('product_attributes')
+                .select('id', 'name')
+                .whereIn('id', attributtesIdForFilters)
+                .catch( err => {
+                    return Errors(err.code);
+                });
+            filtersData.attributes = attributesNameAndId;
+            filtersData.values = filtersValue
+        }
+
         let products = await this.table.select('*')
             .whereIn('id', idProducts)
             .limit(10)
@@ -55,7 +79,7 @@ class Product extends BaseModel {
             img ? products[i].img = img.value : products[i].img = '';
         }
 
-        return {products: products, count: idProducts.length}
+        return {products: products, count: idProducts.length, filtersData: filtersData}
     }
 
     async getProductWithCategories(id) {

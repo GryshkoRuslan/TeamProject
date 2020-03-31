@@ -16,6 +16,7 @@ class productsController {
             res.status(200).json({
                 data: result.products,
                 count: result.count,
+                filtersData: result.filtersData,
                 message: "get products is ok",
                 responseCode: 0,
             })
