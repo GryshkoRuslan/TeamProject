@@ -39,7 +39,7 @@ const filtersAttributesForCategories = (categoryID) => {
     } else if (categoryName == 'PC') {
         return {categoryName: categoryName[0], ids: [5,6,9,17,22,29,30,31,32,33,34,39,40,41]}
     } else if (categoryName == 'watches') {
-        return {categoryName: categoryName[0], ids: [1,2,3,5,6,7,14,15,18,19,20,21,35,36]}
+        return {categoryName: categoryName[0], ids: [1,2,3,5,6,7,13,14,15,18,19,20,21,35,36]}
     } else {
         return false
     }
