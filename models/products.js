@@ -32,6 +32,21 @@ class Product extends BaseModel {
     }
 
     async getProductsWithFilters (query) {
+        if (query.id) {
+            //Для отбора нескольких товаров по id
+            let ids = query.id.split(',');
+            let products = await this.table.select('*')
+                .whereIn('id', ids)
+                .groupBy('id')
+                .catch(err=> {
+                    return Errors(err.code);
+                });
+            for (let i=0; i<products.length; i++) {
+                let img = await serviceLocator.get('db').table('product_attributes_value').select('value').where({'id_product_attributes': 42, 'id_products': products[i].id}).first();
+                img ? products[i].img = img.value : products[i].img = '';
+            }
+            return {products: products}
+        }
         let page = +query.page || 1;
         let offset = (page-1)*10;
         let idCategory = query.category;
