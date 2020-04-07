@@ -27,7 +27,7 @@ const allowCrossDomain = function (req, res, next) {
 app.use(allowCrossDomain);
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(authMiddleware);
 
 routes(app);
