@@ -59,6 +59,7 @@ class Order extends BaseModel {
     async createOrderWithProducts(data, idUser) {
         let order = data;
         let products = order.products;
+        order.status = "new";
         delete order.products;
         order["id_users"] = idUser;
         try {
