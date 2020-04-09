@@ -17,16 +17,21 @@ class Product extends BaseModel {
             .table('manufacturer');
     }
 
+    async addPhotoToProducts (products) {
+        for (let i=0; i<products.length; i++) {
+            let img = await serviceLocator.get('db').table('product_attributes_value').select('value').where({'id_product_attributes': 42, 'id_products': products[i].id}).first();
+            img ? products[i].img = img.value : products[i].img = '';
+        }
+        return products
+    }
+
     async getProductList (page=1) {
         let offset = (page-1)*12;
         let products = await this.table.select('*').limit(12).offset(offset).groupBy('id')
             .catch(err=> {
                 return Errors(err.code);
             });
-        for (let i=0; i<products.length; i++) {
-            let img = await serviceLocator.get('db').table('product_attributes_value').select('value').where({'id_product_attributes': 42, 'id_products': products[i].id}).first();
-            img ? products[i].img = img.value : products[i].img = '';
-        }
+        products = await this.addPhotoToProducts(products);
         let count = await serviceLocator.get('db').table('products').count('id');
         return {products: products, count: count[0].count}
     }
@@ -41,10 +46,7 @@ class Product extends BaseModel {
                 .catch(err=> {
                     return Errors(err.code);
                 });
-            for (let i=0; i<products.length; i++) {
-                let img = await serviceLocator.get('db').table('product_attributes_value').select('value').where({'id_product_attributes': 42, 'id_products': products[i].id}).first();
-                img ? products[i].img = img.value : products[i].img = '';
-            }
+            products = await this.addPhotoToProducts(products);
             return {products: products}
         }
         let page = +query.page || 1;
@@ -92,17 +94,15 @@ class Product extends BaseModel {
             .catch(err=> {
                 return Errors(err.code);
             });
-        for (let i=0; i<products.length; i++) {
-            let img = await serviceLocator.get('db').table('product_attributes_value').select('value').where({'id_product_attributes': 42, 'id_products': products[i].id}).first();
-            img ? products[i].img = img.value : products[i].img = '';
-        }
+
+        products = await this.addPhotoToProducts(products);
 
         return {products: products, count: idProducts.length, filtersData: filtersData}
     }
 
     async getProductWithCategories(id) {
         let product = await this.find(id);
-        if (product==undefined) {
+        if (product===undefined) {
             return Errors('404')
         }
         if (product.status) {
