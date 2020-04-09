@@ -26,8 +26,9 @@ class Product extends BaseModel {
     }
 
     async getProductList (page=1) {
-        let offset = (page-1)*12;
-        let products = await this.table.select('*').limit(12).offset(offset).groupBy('id')
+        let limit = 12;
+        let offset = (page-1)*limit;
+        let products = await this.table.select('*').limit(limit).offset(offset).groupBy('id')
             .catch(err=> {
                 return Errors(err.code);
             });
@@ -50,7 +51,8 @@ class Product extends BaseModel {
             return {products: products}
         }
         let page = +query.page || 1;
-        let offset = (page-1)*10;
+        let limit = 12;
+        let offset = (page-1)*limit;
         let idCategory = query.category;
         let idProductsObjects = await this.categoriesProductTable
             .select('id_products as id')
@@ -87,7 +89,7 @@ class Product extends BaseModel {
 
         let products = await this.table.select('*')
             .whereIn('id', idProducts)
-            .limit(10)
+            .limit(limit)
             .offset(offset)
             .groupBy('id')
             .orderBy('id')
