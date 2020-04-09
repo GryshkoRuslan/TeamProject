@@ -1,6 +1,7 @@
 const BaseModel = require('./base.model');
 const serviceLocator = require('../services/service.locator');
 const Errors = require('./Errors');
+const {filtersAttributesForCategories} = require("../services/filtersAttributesForCategories");
 
 class Product extends BaseModel {
     constructor() {
@@ -16,23 +17,92 @@ class Product extends BaseModel {
             .table('manufacturer');
     }
 
-    async getProductList (page=1) {
-        let offset = (page-1)*10;
-        let products = await this.table.select('*').limit(10).offset(offset).groupBy('id')
-            .catch(err=> {
-                return Errors(err.code);
-            });
+    async addPhotoToProducts (products) {
         for (let i=0; i<products.length; i++) {
             let img = await serviceLocator.get('db').table('product_attributes_value').select('value').where({'id_product_attributes': 42, 'id_products': products[i].id}).first();
             img ? products[i].img = img.value : products[i].img = '';
         }
+        return products
+    }
+
+    async getProductList (page=1) {
+        let offset = (page-1)*12;
+        let products = await this.table.select('*').limit(12).offset(offset).groupBy('id')
+            .catch(err=> {
+                return Errors(err.code);
+            });
+        products = await this.addPhotoToProducts(products);
         let count = await serviceLocator.get('db').table('products').count('id');
         return {products: products, count: count[0].count}
     }
 
+    async getProductsWithFilters (query) {
+        if (query.id) {
+            //Для отбора нескольких товаров по id
+            let ids = query.id.split(',');
+            let products = await this.table.select('*')
+                .whereIn('id', ids)
+                .groupBy('id')
+                .catch(err=> {
+                    return Errors(err.code);
+                });
+            products = await this.addPhotoToProducts(products);
+            return {products: products}
+        }
+        let page = +query.page || 1;
+        let offset = (page-1)*10;
+        let idCategory = query.category;
+        let idProductsObjects = await this.categoriesProductTable
+            .select('id_products as id')
+            .where('id_categories', idCategory)
+            .catch(err=> {
+                return Errors(err.code);
+            });
+        let idProducts = idProductsObjects.map(p=> p.id);
+
+        let attributtesForFilters = filtersAttributesForCategories(idCategory);
+        let categoryName = attributtesForFilters.categoryName;
+        let attributtesIdForFilters = attributtesForFilters.ids;
+        let filtersData = {};
+        if (attributtesIdForFilters) {
+            let attributesValueForFilters = await serviceLocator.get('db').table('product_attributes_value')
+                .select('id_product_attributes', 'value')
+                .whereIn('id_products', idProducts)
+                .catch( err => {
+                    return Errors(err.code);
+                });
+            let filtersValue = attributesValueForFilters.filter(a => {
+                return a.id_product_attributes == attributtesIdForFilters.filter(id => id===a.id_product_attributes);
+            });
+            let attributesNameAndId = await serviceLocator.get('db').table('product_attributes')
+                .select('id', 'name')
+                .whereIn('id', attributtesIdForFilters)
+                .catch( err => {
+                    return Errors(err.code);
+                });
+            filtersData.attributes = attributesNameAndId;
+            filtersData.values = filtersValue;
+            filtersData.categoryName = categoryName;
+        }
+
+        let products = await this.table.select('*')
+            .whereIn('id', idProducts)
+            .limit(10)
+            .offset(offset)
+            .groupBy('id')
+            .orderBy('id')
+            .catch(err=> {
+                return Errors(err.code);
+            });
+
+        products = await this.addPhotoToProducts(products);
+
+        return {products: products, count: idProducts.length, filtersData: filtersData}
+    }
+
     async getProductWithCategories(id) {
         let product = await this.find(id);
-        if (product==undefined) {
+        if (product===undefined) {
             return Errors('404')
         }
         if (product.status) {
@@ -73,7 +143,7 @@ class Product extends BaseModel {
         return product
     }
 
-    async saveProduct(product) {
+    async createProduct(product) {
         let attributes = product.attributes;
         delete product.attributes;
         let categories = product.categories;

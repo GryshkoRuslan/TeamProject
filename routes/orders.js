@@ -5,8 +5,8 @@ const ordersController = require("../controllers/ordersController");
 const AttachResourceController = require("../controllers/AttachResourceController");
 
 router.use(function(req, res, next) {
-    AttachResourceController(router, ordersController);
-    next();
+        AttachResourceController(router, ordersController);
+        next();
 });
 
 

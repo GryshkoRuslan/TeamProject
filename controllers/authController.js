@@ -2,14 +2,23 @@ const passport = require('../auth/passport');
 const User = require('../models/users');
 const md5 = require('md5');
 const createError = require('http-errors');
+const Roles = require('../auth/acl').Roles;
 
 class authController {
-    static login (req, res) {
+    static login (req, res, next) {
         passport.authenticate('local', { session: false }, (err, user) => {
             if(err) {
-                throw new Error(err)
+                if (+err===404) {
+                    next(createError(404, "Пользователь не найден"));
+                } else {
+                    throw new Error(err);
+                }
             }
-            res.send(user);
+            res.status(200).json({
+                data: user,
+                message: "login success",
+                responseCode: 0,
+            })
         })(req, res)
     }
 
@@ -43,6 +52,23 @@ class authController {
             res.status(200).json({
                 data: user,
                 message: "register success",
+                responseCode: 0,
+            })
+        }
+    }
+
+    static me (req, res, next) {
+        if (req.user.role === Roles.GUEST) {
+            res.status(200).json({
+                data: {},
+                message: "you are not authorized",
+                responseCode: 1,
+            })
+        } else {
+            delete req.user.role;
+            res.status(200).json({
+                data: req.user,
+                message: "login success",
                 responseCode: 0,
             })
         }

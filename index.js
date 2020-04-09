@@ -17,8 +17,17 @@ serviceLocator.register('db', require('knex')({
     }
 }));
 
+const allowCrossDomain = function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Methods', 'PROPFIND, PROPPATCH, COPY, MOVE, DELETE, MKCOL, LOCK, UNLOCK, PUT, GETLIB, VERSION-CONTROL, CHECKIN, CHECKOUT, UNCHECKOUT, REPORT, UPDATE, CANCELUPLOAD, HEAD, OPTIONS, GET, POST');
+    res.setHeader('Access-Control-Allow-Headers', 'origin, content-type, X-Requested-With, accept, authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    next();
+};
+app.use(allowCrossDomain);
+
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(authMiddleware);
 
 routes(app);

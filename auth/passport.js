@@ -11,7 +11,7 @@ passport.use(new LocalStrategy(
         const user = await UserModel.getUserByCredentials(username, password);
 
         if(!user) {
-            return done('User not found', false);
+            return done(404, false);
         }
         user.token = uuidv4();
         await UserModel.store(user);

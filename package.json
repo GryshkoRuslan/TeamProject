@@ -19,6 +19,7 @@
   "homepage": "https://github.com/GryshkoRuslan/TeamProject#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "dayjs": "^1.8.21",
     "express": "^4.17.1",
     "http-errors": "^1.7.3",
     "knex": "^0.20.8",
