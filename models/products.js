@@ -1,6 +1,7 @@
 const BaseModel = require('./base.model');
 const serviceLocator = require('../services/service.locator');
 const Errors = require('./Errors');
+const {filterProductsByValues} = require("../services/filterProductsByValues");
 const {filtersAttributesForCategories} = require("../services/filtersAttributesForCategories");
 
 class Product extends BaseModel {
@@ -61,6 +62,19 @@ class Product extends BaseModel {
                 return Errors(err.code);
             });
         let idProducts = idProductsObjects.map(p=> p.id);
+
+        if (query.filters) {
+            let filters = query.filters.split(";").map(filter=>filter.split("_"));
+            let idAttributtes = filters.map(filter=>+filter[0]);
+            let dataForAnalysis = await this.productAttributesValueTable
+                .select('id_product_attributes', 'id_products', 'value')
+                .whereIn('id_products', idProducts)
+                .whereIn('id_product_attributes', idAttributtes)
+                .catch(err=> {
+                    return Errors(err.code);
+                });
+            idProducts = filterProductsByValues(dataForAnalysis, filters);
+        }
 
         let attributtesForFilters = filtersAttributesForCategories(idCategory);
         let categoryName = attributtesForFilters.categoryName;
