@@ -51,6 +51,7 @@ class Product extends BaseModel {
             products = await this.addPhotoToProducts(products);
             return {products: products}
         }
+        let orderBy = query.orderBy || "asc";
         let page = +query.page || 1;
         let limit = 12;
         let offset = (page-1)*limit;
@@ -106,7 +107,7 @@ class Product extends BaseModel {
             .limit(limit)
             .offset(offset)
             .groupBy('id')
-            .orderBy('id')
+            .orderBy('id', orderBy)
             .catch(err=> {
                 return Errors(err.code);
             });
