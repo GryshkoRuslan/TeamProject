@@ -15,7 +15,7 @@ const filterProductsByValues = (data, filters) => {
 
         if (forFilterTypeDefinitions.length===1) {
             let productsId = filterValues.map(value=> {
-                let filteredData =  someData.filter(data=>+data.value.split(" ")[0]===+value);
+                let filteredData =  someData.filter(data=>data.value.split(" ")[0]===value);
                 return filteredData.map(data=>data.id_products);
             });
 
@@ -39,7 +39,6 @@ const filterProductsByValues = (data, filters) => {
             return concatProductsId(productsId);
         }
     });
-
     let result = ids.reduce((res,arr)=> {
         if (!res.length) {
             return arr;
