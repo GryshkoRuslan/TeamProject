@@ -29,7 +29,8 @@ class Product extends BaseModel {
     async getProductList (page=1) {
         let limit = 12;
         let offset = (page-1)*limit;
-        let products = await this.table.select('*').limit(limit).offset(offset).groupBy('id')
+        let orderBy = "desc";
+        let products = await this.table.select('*').limit(limit).offset(offset).groupBy('id').orderBy('id', orderBy)
             .catch(err=> {
                 return Errors(err.code);
             });
