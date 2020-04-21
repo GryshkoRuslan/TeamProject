@@ -65,8 +65,15 @@ class usersController {
     }
 
     static async update (req, res, next) {
-        if (req.user.role  == Roles.ADMIN) {
-            let user = await new User().store(req.body);
+        if (req.user.role !== Roles.GUEST) {
+            let data;
+            if (req.user.role === Roles.USER) {
+                data = {...req.body};
+                data.id = req.user.id;
+            } else {
+                data = {...req.body};
+            }
+            let user = await new User().store(data);
             if (user.status) {
                 next(user);
             } else {
@@ -76,7 +83,7 @@ class usersController {
                     responseCode: 0,
                 })
             }
-        }  else {
+        } else {
             next(createError(403, "Не хватает прав"));
         }
     }
